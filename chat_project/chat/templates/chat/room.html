@@ -1,28 +1,47 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Chat Room</title>
-</head>
-<body>
-    <h2>Chat Room</h2>
-    <div id="chat-box"></div>
-    <input id="message-input" type="text" placeholder="Type a message..." />
-    <button id="send-button">Send</button>
+{% extends 'chat/layout.html' %} {% block content %}
 
-    <script>
-        const username = prompt("Enter your username:");
-        const chatSocket = new WebSocket("ws://" + window.location.host + "/ws/chat/");
+<main class="container-lg">
+  <div
+    id="chat-box"
+    class="min-vh-100 position-relative border-start border-end"
+  >
+    <div class="bg-dark position-absolute top-0 w-100 p-3">
+      <h2>
+        <span class="text-white">Chat Room</span>
+      </h2>
+    </div>
 
-        chatSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            document.getElementById("chat-box").innerHTML += `<p><b>${data.username}:</b> ${data.message}</p>`;
-        };
+    <div class="position-absolute bottom-0 w-100 pb-4 px-3">
+      <form action="" class="input-group">
+        <input
+          id="message-input"
+          type="text"
+          placeholder="Type a message..."
+          class="form-control"
+        />
+        <button id="send-button" class="btn btn-primary">Send</button>
+      </form>
+    </div>
+  </div>
+</main>
 
-        document.getElementById("send-button").onclick = function() {
-            const messageInput = document.getElementById("message-input");
-            chatSocket.send(JSON.stringify({ "message": messageInput.value, "username": username }));
-            messageInput.value = "";
-        };
-    </script>
-</body>
-</html>
+{% endblock %} {% block scripts %}
+<script>
+  const chatBox = document.getElementById("chat-box");
+  const messageInput = document.getElementById("message-input");
+  const sendButton = document.getElementById("send-button");
+
+  const ws = new WebSocket(`ws://${window.location.host}/ws/chat/room/`);
+
+  ws.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+    chatBox.innerHTML += `<p>${message.author}: ${message.content}</p>`;
+  };
+
+  sendButton.onclick = () => {
+    const message = messageInput.value;
+    ws.send(message);
+    messageInput.value = "";
+  };
+</script>
+{% endblock %}
