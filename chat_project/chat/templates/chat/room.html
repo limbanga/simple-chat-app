@@ -2,17 +2,18 @@
 
 <main class="container-lg">
   <div
-    id="chat-box"
+   
     class="min-vh-100 position-relative border-start border-end"
   >
-    <div class="bg-dark position-absolute top-0 w-100 p-3">
-      <h2>
+    <div class="position-absolute top-0 w-100 p-3">
+      <h2 class="bg-dark text-center p-3">
         <span class="text-white">Chat Room</span>
       </h2>
+        <div id="chat-box" class="p-3"></div>
     </div>
 
     <div class="position-absolute bottom-0 w-100 pb-4 px-3">
-      <form action="" class="input-group">
+      <div action="" class="input-group">
         <input
           id="message-input"
           type="text"
@@ -20,28 +21,31 @@
           class="form-control"
         />
         <button id="send-button" class="btn btn-primary">Send</button>
-      </form>
+      </d>
     </div>
   </div>
 </main>
 
 {% endblock %} {% block scripts %}
 <script>
-  const chatBox = document.getElementById("chat-box");
-  const messageInput = document.getElementById("message-input");
-  const sendButton = document.getElementById("send-button");
+    const username = prompt("Enter your username:");
+    const chatSocket = new WebSocket(
+      "ws://" + window.location.host + "/ws/chat/"
+    );
 
-  const ws = new WebSocket(`ws://${window.location.host}/ws/chat/room/`);
+    chatSocket.onmessage = function (e) {
+      const data = JSON.parse(e.data);
+      document.getElementById(
+        "chat-box"
+      ).innerHTML += `<p><b>${data.username}:</b> ${data.message}</p>`;
+    };
 
-  ws.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    chatBox.innerHTML += `<p>${message.author}: ${message.content}</p>`;
-  };
-
-  sendButton.onclick = () => {
-    const message = messageInput.value;
-    ws.send(message);
-    messageInput.value = "";
-  };
-</script>
+    document.getElementById("send-button").onclick = function () {
+      const messageInput = document.getElementById("message-input");
+      chatSocket.send(
+        JSON.stringify({ message: messageInput.value, username: username })
+      );
+      messageInput.value = "";
+    };
+  </script>
 {% endblock %}
