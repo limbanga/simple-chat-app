@@ -151,7 +151,7 @@ CHANNEL_LAYERS = {
 SITE_ID = 1
 
 # Cấu hình xác thực người dùng
-ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_LOGIN_METHODS = ["username", "email"]
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
@@ -167,12 +167,10 @@ PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL = (
     "http://localhost:3000/password-reset/confirm/"
 )
 
-# Cấu hình REST Framework
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",  # Dùng JWT
-        "rest_framework.authentication.SessionAuthentication",
-    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ]
 }
 
 # Sử dụng JWT thay vì token mặc định
